@@ -33,11 +33,11 @@ import java.util.logging.LogRecord;
 
 public class DisplayCodeActivity extends AppCompatActivity {
 
-    private static int SIDE = 600;
+    private static int SIDE = 800;
     ImageView qrImage;
     Button restart;
-    private static int QRSIZE = 2950;
-    int TIME = 300;
+    private static int QRSIZE = 2500;
+    int TIME = 500;
     int numOfQRCodes;
     ArrayList<String> chunks;
     ArrayList<Bitmap> codes = new ArrayList<>();
@@ -59,32 +59,37 @@ public class DisplayCodeActivity extends AppCompatActivity {
         restart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                restart.setClickable(false);
                 Restart();
             }
         });
     }
 
     void Restart(){
-        // Convert image to bitmap and bitmap to string
-        Bitmap moonBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.icon);
-        String moonStr = BitMapToString(moonBitmap);
 
-        // Get Number of characters in string
-        int moonStrLen = moonStr.length();
-
-        // Calculate Number of QR Codes Necessary
-        numOfQRCodes = (int) Math.ceil(moonStrLen/ ((double) QRSIZE));
-
-        // Split
-        chunks = Lists.newArrayList(Splitter.fixedLength(QRSIZE).split(moonStr));
-        //call new thread
-
-        ProgressDialog pd = new ProgressDialog(DisplayCodeActivity.this);
-        pd.setMessage("loading");
-        pd.show();
-        //encoding = ProgressDialog.show(DisplayCodeActivity.this, "dialog title", "dialog message", true);
 
         if(codes.size() == 0) {
+
+            // Convert image to bitmap and bitmap to string
+            Bitmap moonBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.moon);
+            String moonStr = BitMapToString(moonBitmap);
+
+            // Get Number of characters in string
+            int moonStrLen = moonStr.length();
+
+            // Calculate Number of QR Codes Necessary
+            numOfQRCodes = (int) Math.ceil(moonStrLen/ ((double) QRSIZE));
+
+            // Split
+            chunks = Lists.newArrayList(Splitter.fixedLength(QRSIZE).split(moonStr));
+            //call new thread
+
+            //ProgressDialog pd = new ProgressDialog(DisplayCodeActivity.this);
+            //pd.setMessage("loading");
+            // pd.show();
+            //encoding = ProgressDialog.show(DisplayCodeActivity.this, "dialog title", "dialog message", true);
+
+
             for (int i = 0; i < numOfQRCodes; i++) {
                 codes.add(encodeToQrCode(String.format("%02d", i) + " " + chunks.get(i), SIDE, SIDE));
                 Log.d("bitmap encoded", String.valueOf(i));
@@ -92,20 +97,24 @@ public class DisplayCodeActivity extends AppCompatActivity {
         }
 
         //encoding.dismiss();
-        pd.dismiss();
+        //pd.dismiss();
         new CountDownTimer((numOfQRCodes + 1) * TIME, TIME){
             int index = 0;
             @Override
             public void onTick(long millisUntilFinished) {
-                qrImage.setImageBitmap(codes.get(index));
-                Log.d("timer", String.valueOf(numOfQRCodes - millisUntilFinished/1000));
-                Log.d("index value", String.valueOf(index));
-                index++;
+
+                if(index < numOfQRCodes) {
+                    qrImage.setImageBitmap(codes.get(index));
+                    Log.d("index value", String.valueOf(index));
+                    index++;
+                } else {
+                    index = 0;
+                }
             }
 
             @Override
             public void onFinish() {
-
+                Restart();
             }
         }.start();
     }
