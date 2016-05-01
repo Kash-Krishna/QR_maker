@@ -1,12 +1,20 @@
 package com.qr_maker.backchannel.qr_maker;
 
 import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
+import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -15,6 +23,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -23,24 +32,36 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
 public class DisplayCodeActivity extends AppCompatActivity {
 
+    final int REQ_IMG_CAP = 1;
     private static int SIDE = 500;
-    ImageView qrImage;
-    Button restart;
     private static int QRSIZE = 1000;
     int TIME = 500;
+
+    ImageView qrImage;
+    Button restart;
+    Button takePhoto;
+    Bitmap photo;
     int numOfQRCodes;
+
     ArrayList<String> chunks;
     ArrayList<Bitmap> codes = new ArrayList<>();
+
+    Intent pastIntent = getIntent();
+
+    //byte[] byteArray = pastIntent.getByteArrayExtra("UserPhoto");
+    //Bitmap UserPhoto = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
 
     ProgressDialog encoding;
 
@@ -52,7 +73,7 @@ public class DisplayCodeActivity extends AppCompatActivity {
         //Inflate qr Image
         qrImage = (ImageView) findViewById(R.id.qrImage);
         restart = (Button) findViewById(R.id.restart);
-
+        takePhoto = (Button) findViewById(R.id.photo);
 
         restart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,40 +82,60 @@ public class DisplayCodeActivity extends AppCompatActivity {
                 Restart();
             }
         });
+
+        takePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(intent, REQ_IMG_CAP);
+                }
+            }
+        });
     }
 
-    void Restart(){
+    void Restart() {
 
 
-        if(codes.size() == 0) {
+        if (codes.size() == 0) {
 
-            // Convert image to bitmap and bitmap to string
-            Bitmap moonBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.icon);
-            String moonStr = BitMapToString(moonBitmap);
+            String imgStr;
+            //if (UserPhoto.getHeight() > 0 || UserPhoto.getWidth() > 0) {
+            //    imgStr = BitMapToString(UserPhoto);
+            //}
+            // Convert default image to bitmap and bitmap to string
+            //else {
+            //Bitmap moonBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.icon);
+            ByteArrayOutputStream tmpstream = new ByteArrayOutputStream();
+            photo.compress(Bitmap.CompressFormat.PNG, 100, tmpstream);
+            photo = BitmapFactory.decodeStream(new ByteArrayInputStream(tmpstream.toByteArray()));
 
+            imgStr = BitMapToString(photo);
+            // }
             // Get Number of characters in string
-            int moonStrLen = moonStr.length();
+            int imgStrLen = imgStr.length();
 
             // Calculate Number of QR Codes Necessary
-            numOfQRCodes = (int) Math.ceil(moonStrLen/ ((double) QRSIZE));
+            numOfQRCodes = (int) Math.ceil(imgStrLen / ((double) QRSIZE));
 
             // Split
-            chunks = Lists.newArrayList(Splitter.fixedLength(QRSIZE).split(moonStr));
+            chunks = Lists.newArrayList(Splitter.fixedLength(QRSIZE).split(imgStr));
 
             codes.add(encodeToQrCode(String.format("%02d", 0) + (numOfQRCodes), SIDE, SIDE));
 
-            for (int i = 1; i < numOfQRCodes+1; i++) {
-                codes.add(encodeToQrCode(String.format("%02d", i) + " " + chunks.get(i-1), SIDE, SIDE));
+            for (int i = 1; i < numOfQRCodes + 1; i++) {
+                codes.add(encodeToQrCode(String.format("%02d", i) + " " + chunks.get(i - 1), SIDE, SIDE));
                 Log.d("bitmap encoded", String.valueOf(i));
             }
         }
 
-        new CountDownTimer((numOfQRCodes + 2) * TIME, TIME){
+        new CountDownTimer((numOfQRCodes + 2) * TIME, TIME) {
             int index = 0;
+
             @Override
             public void onTick(long millisUntilFinished) {
 
-                if(index < numOfQRCodes+1) {
+                if (index < numOfQRCodes + 1) {
                     qrImage.setImageBitmap(codes.get(index));
                     Log.d("index value", String.valueOf(index));
                     index++;
@@ -113,14 +154,14 @@ public class DisplayCodeActivity extends AppCompatActivity {
     Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            for (int i = 0; i < numOfQRCodes; i++){
-                codes.add(encodeToQrCode( String.format("%02d", i) + " " + chunks.get(i), SIDE, SIDE));
+            for (int i = 0; i < numOfQRCodes; i++) {
+                codes.add(encodeToQrCode(String.format("%02d", i) + " " + chunks.get(i), SIDE, SIDE));
                 Log.d("bitmap encoded", String.valueOf(i));
             }
 
-            runOnUiThread(new Runnable(){
+            runOnUiThread(new Runnable() {
                 @Override
-                public void run(){
+                public void run() {
                     encoding.dismiss();
                 }
             });
@@ -128,12 +169,11 @@ public class DisplayCodeActivity extends AppCompatActivity {
     };
 
 
-
-    public String BitMapToString(Bitmap bitmap){
-        ByteArrayOutputStream ByteStream=new  ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG,100, ByteStream);
-        byte [] b=ByteStream.toByteArray();
-        String temp=Base64.encodeToString(b, Base64.DEFAULT);
+    public String BitMapToString(Bitmap bitmap) {
+        ByteArrayOutputStream ByteStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, ByteStream);
+        byte[] b = ByteStream.toByteArray();
+        String temp = Base64.encodeToString(b, Base64.DEFAULT);
         return temp;
     }
 
@@ -155,7 +195,18 @@ public class DisplayCodeActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQ_IMG_CAP && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            photo = cropCenter((Bitmap) extras.get("data"));
+            Restart();
+        }
+    }
 
 
-
+    public static Bitmap cropCenter(Bitmap bmp) {
+        int dimension = Math.min(bmp.getWidth(), bmp.getHeight());
+        return ThumbnailUtils.extractThumbnail(bmp, dimension, dimension);
+    }
 }

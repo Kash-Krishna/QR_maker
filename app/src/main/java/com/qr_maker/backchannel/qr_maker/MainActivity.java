@@ -21,6 +21,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,10 +47,11 @@ public class MainActivity extends AppCompatActivity {
                     {
                         Log.v("EditText", mEdit.getText().toString());
                         Intent intent = new Intent(MainActivity.this, DisplayCodeActivity.class);
-                        EditText editText = (EditText)findViewById(R.id.editText);
-                        if (imgBitmap.getWidth() > 0 || imgBitmap.getHeight() > 0) {
-                            intent.putExtra("UserPhoto", imgBitmap);
-                        }
+                        //EditText editText = (EditText)findViewById(R.id.editText);
+                        ByteArrayOutputStream tmpstream = new ByteArrayOutputStream();
+                        imgBitmap.compress(Bitmap.CompressFormat.PNG, 100, tmpstream);
+                        byte[] byteArray = tmpstream.toByteArray();
+                        intent.putExtra("UserPhoto", byteArray);
                         startActivity(intent);
 
                     }
