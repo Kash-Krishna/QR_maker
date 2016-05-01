@@ -30,10 +30,18 @@
         android:layout_height="wrap_content"
         android:text="BackChannel IT!"
         android:id="@+id/button"
+        android:onClick="sendMessage"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Take a Photo!"
+        android:id="@+id/button2"
         android:layout_below="@+id/editText"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="33dp"
-        android:onClick="sendMessage" />
+        android:layout_marginTop="48dp" />
 
 
 </RelativeLayout>

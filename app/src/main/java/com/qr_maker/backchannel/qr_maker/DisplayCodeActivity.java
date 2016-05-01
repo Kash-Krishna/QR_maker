@@ -33,18 +33,16 @@ import java.util.logging.LogRecord;
 
 public class DisplayCodeActivity extends AppCompatActivity {
 
-    private static int SIDE = 700;
+    private static int SIDE = 500;
     ImageView qrImage;
     Button restart;
-    private static int QRSIZE = 2200;
+    private static int QRSIZE = 1000;
     int TIME = 500;
     int numOfQRCodes;
     ArrayList<String> chunks;
     ArrayList<Bitmap> codes = new ArrayList<>();
 
-
     ProgressDialog encoding;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,12 +80,6 @@ public class DisplayCodeActivity extends AppCompatActivity {
 
             // Split
             chunks = Lists.newArrayList(Splitter.fixedLength(QRSIZE).split(moonStr));
-            //call new thread
-
-            //ProgressDialog pd = new ProgressDialog(DisplayCodeActivity.this);
-            //pd.setMessage("loading");
-            // pd.show();
-            //encoding = ProgressDialog.show(DisplayCodeActivity.this, "dialog title", "dialog message", true);
 
             codes.add(encodeToQrCode(String.format("%02d", 0) + (numOfQRCodes), SIDE, SIDE));
 
@@ -97,8 +89,6 @@ public class DisplayCodeActivity extends AppCompatActivity {
             }
         }
 
-        //encoding.dismiss();
-        //pd.dismiss();
         new CountDownTimer((numOfQRCodes + 2) * TIME, TIME){
             int index = 0;
             @Override
