@@ -91,7 +91,7 @@ public class DisplayCodeActivity extends AppCompatActivity {
 
             codes.add(encodeToQrCode(String.format("%02d", 0) + numOfQRCodes, SIDE, SIDE));
 
-            for (int i = 1; i < numOfQRCodes; i++) {
+            for (int i = 1; i < numOfQRCodes+1; i++) {
                 codes.add(encodeToQrCode(String.format("%02d", i) + " " + chunks.get(i), SIDE, SIDE));
                 Log.d("bitmap encoded", String.valueOf(i));
             }

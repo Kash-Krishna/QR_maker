@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     //My code
     Button sButton;
     EditText mEdit;
-    public final static String EXTRA_M = "com.backchannel.qr_maker.MESSAGE";
+   // public final static String MAPoBITS = "com.backchannel.qr_maker.MAP;
 
 
     @Override
@@ -42,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
                         Log.v("EditText", mEdit.getText().toString());
                         Intent intent = new Intent(MainActivity.this, DisplayCodeActivity.class);
                         EditText editText = (EditText)findViewById(R.id.editText);
-                        String message = editText.getText().toString();
-                        intent.putExtra(EXTRA_M, message);
+                       // Bitmap map = ;
+                       // intent.putExtra(MAPoBITS, map);
                         startActivity(intent);
 
                     }
