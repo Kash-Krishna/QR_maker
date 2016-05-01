@@ -100,16 +100,16 @@ public class DisplayCodeActivity extends AppCompatActivity {
         //encoding.dismiss();
         //pd.dismiss();
         new CountDownTimer((numOfQRCodes + 1) * TIME, TIME){
-            int index = 0;
+            int index = 1;
             @Override
             public void onTick(long millisUntilFinished) {
 
-                if(index < numOfQRCodes) {
+                if(index < numOfQRCodes+1) {
                     qrImage.setImageBitmap(codes.get(index));
                     Log.d("index value", String.valueOf(index));
                     index++;
                 } else {
-                    index = 0;
+                    index = 1;
                 }
             }
 
