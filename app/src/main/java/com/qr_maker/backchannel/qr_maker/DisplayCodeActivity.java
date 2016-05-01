@@ -33,10 +33,10 @@ import java.util.logging.LogRecord;
 
 public class DisplayCodeActivity extends AppCompatActivity {
 
-    private static int SIDE = 500;
+    private static int SIDE = 700;
     ImageView qrImage;
     Button restart;
-    private static int QRSIZE = 1000;
+    private static int QRSIZE = 2200;
     int TIME = 500;
     int numOfQRCodes;
     ArrayList<String> chunks;
@@ -99,7 +99,7 @@ public class DisplayCodeActivity extends AppCompatActivity {
 
         //encoding.dismiss();
         //pd.dismiss();
-        new CountDownTimer((numOfQRCodes + 1) * TIME, TIME){
+        new CountDownTimer((numOfQRCodes + 2) * TIME, TIME){
             int index = 0;
             @Override
             public void onTick(long millisUntilFinished) {
