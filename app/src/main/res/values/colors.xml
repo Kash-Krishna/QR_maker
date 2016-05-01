@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="white">#FFFFFF</color>
+    <color name="coal">#424242</color>
+    <color name="primaryColor">#2ecc71</color>
+    <color name="primaryColorDark">#27ae60</color>
+    <color name="primaryColorLight">#D8A856</color>
+    <color name="colorAccent">#c0392b</color>
+    <color name="primaryText">#212121</color>
+    <color name="secondaryText">#727272</color>
+    <color name="titleText">#8F8F8F</color>
+    <color name="darkText">#27292b</color>
+    <color name="divider">#CFCFCF</color>
+    <color name="dividerColor">#B6B6B6</color>
+    <color name="cloud">#fbfcfc</color>
+    <color name="darkCloud">#f0f4f4</color>
+
+
+    <color name="background">#212121</color>
+    <color name="backgroundCard">#27292b</color>
+    <color name="backgroundTranslucent">#AA212121</color>
+    <color name="backgroundCardTranslucent">#8827292b</color>
+
+
+    <color name="flatDarkGreen">#27ae60</color>
+    <color name="flatYellow">#f1c40f</color>
+    <color name="flatRed">#FF5252</color>
+    <color name="flatBlue">#19B5FE</color>
 </resources>

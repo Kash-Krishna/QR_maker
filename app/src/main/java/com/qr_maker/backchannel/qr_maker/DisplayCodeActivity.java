@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -17,10 +18,12 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatButton;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -45,18 +48,24 @@ import java.util.logging.LogRecord;
 public class DisplayCodeActivity extends AppCompatActivity {
 
     final int REQ_IMG_CAP = 1;
-    private static int SIDE = 500;
-    private static int QRSIZE = 1000;
-    int TIME = 500;
+    private static int SIDE = 700;
+    private static int QRSIZE = 2000;
+    int TIME = 800;
+
+    CountDownTimer timer;
 
     ImageView qrImage;
     Button restart;
     Button takePhoto;
+    AppCompatButton symantec;
+    AppCompatButton polymail;
+    AppCompatButton kitten;
     Bitmap photo;
     int numOfQRCodes;
 
     ArrayList<String> chunks;
     ArrayList<Bitmap> codes = new ArrayList<>();
+
 
     Intent pastIntent = getIntent();
 
@@ -70,16 +79,55 @@ public class DisplayCodeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_code);
 
+        getSupportActionBar().setElevation(0);
+
         //Inflate qr Image
         qrImage = (ImageView) findViewById(R.id.qrImage);
         restart = (Button) findViewById(R.id.restart);
         takePhoto = (Button) findViewById(R.id.photo);
 
+        symantec = (AppCompatButton) findViewById(R.id.symantec);
+        polymail = (AppCompatButton) findViewById(R.id.polymail);
+        kitten = (AppCompatButton) findViewById(R.id.kitten);
+
+
+        ColorStateList colorStateList = new ColorStateList(new int[][] {{0}}, new int[] {0xFF27ae60}); // 0xAARRGGBB
+        symantec.setSupportBackgroundTintList(colorStateList);
+        polymail.setSupportBackgroundTintList(colorStateList);
+        kitten.setSupportBackgroundTintList(colorStateList);
+
+
+
+        symantec.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                codes.clear();
+                Restart(R.drawable.symantec);
+            }
+        });
+
+        polymail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                codes.clear();
+                Restart(R.mipmap.icon);
+            }
+        });
+
+        kitten.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                codes.clear();
+                Restart(R.mipmap.icon);
+            }
+        });
+
+
         restart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 restart.setClickable(false);
-                Restart();
+
             }
         });
 
@@ -94,24 +142,16 @@ public class DisplayCodeActivity extends AppCompatActivity {
         });
     }
 
-    void Restart() {
+
+    void Restart(final int icon) {
 
 
         if (codes.size() == 0) {
 
             String imgStr;
-            //if (UserPhoto.getHeight() > 0 || UserPhoto.getWidth() > 0) {
-            //    imgStr = BitMapToString(UserPhoto);
-            //}
-            // Convert default image to bitmap and bitmap to string
-            //else {
-            //Bitmap moonBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.icon);
-            ByteArrayOutputStream tmpstream = new ByteArrayOutputStream();
-            photo.compress(Bitmap.CompressFormat.PNG, 100, tmpstream);
-            photo = BitmapFactory.decodeStream(new ByteArrayInputStream(tmpstream.toByteArray()));
+            Bitmap moonBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), icon);
+            imgStr = BitMapToString(moonBitmap);
 
-            imgStr = BitMapToString(photo);
-            // }
             // Get Number of characters in string
             int imgStrLen = imgStr.length();
 
@@ -129,7 +169,11 @@ public class DisplayCodeActivity extends AppCompatActivity {
             }
         }
 
-        new CountDownTimer((numOfQRCodes + 2) * TIME, TIME) {
+        if(timer != null){
+            timer.cancel();
+        }
+
+        timer = new CountDownTimer((numOfQRCodes + 2) * TIME, TIME) {
             int index = 0;
 
             @Override
@@ -146,28 +190,28 @@ public class DisplayCodeActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
-                Restart();
+                Restart(icon);
             }
-        }.start();
+        };
+
+        timer.start();
     }
 
-    Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            for (int i = 0; i < numOfQRCodes; i++) {
-                codes.add(encodeToQrCode(String.format("%02d", i) + " " + chunks.get(i), SIDE, SIDE));
-                Log.d("bitmap encoded", String.valueOf(i));
-            }
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    encoding.dismiss();
-                }
-            });
-        }
-    };
+    @Override
+    protected void onPause() {
+        super.onPause();
 
+        timer.cancel();
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        timer.cancel();
+    }
 
     public String BitMapToString(Bitmap bitmap) {
         ByteArrayOutputStream ByteStream = new ByteArrayOutputStream();
@@ -200,7 +244,7 @@ public class DisplayCodeActivity extends AppCompatActivity {
         if (requestCode == REQ_IMG_CAP && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             photo = cropCenter((Bitmap) extras.get("data"));
-            Restart();
+
         }
     }
 
