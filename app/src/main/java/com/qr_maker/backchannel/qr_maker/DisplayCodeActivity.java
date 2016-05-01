@@ -71,7 +71,7 @@ public class DisplayCodeActivity extends AppCompatActivity {
         if(codes.size() == 0) {
 
             // Convert image to bitmap and bitmap to string
-            Bitmap moonBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.moon);
+            Bitmap moonBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.icon);
             String moonStr = BitMapToString(moonBitmap);
 
             // Get Number of characters in string
@@ -89,10 +89,10 @@ public class DisplayCodeActivity extends AppCompatActivity {
             // pd.show();
             //encoding = ProgressDialog.show(DisplayCodeActivity.this, "dialog title", "dialog message", true);
 
-            codes.add(encodeToQrCode(String.format("%02d", 0) + numOfQRCodes, SIDE, SIDE));
+            codes.add(encodeToQrCode(String.format("%02d", 0) + (numOfQRCodes), SIDE, SIDE));
 
             for (int i = 1; i < numOfQRCodes+1; i++) {
-                codes.add(encodeToQrCode(String.format("%02d", i) + " " + chunks.get(i), SIDE, SIDE));
+                codes.add(encodeToQrCode(String.format("%02d", i) + " " + chunks.get(i-1), SIDE, SIDE));
                 Log.d("bitmap encoded", String.valueOf(i));
             }
         }
@@ -100,7 +100,7 @@ public class DisplayCodeActivity extends AppCompatActivity {
         //encoding.dismiss();
         //pd.dismiss();
         new CountDownTimer((numOfQRCodes + 1) * TIME, TIME){
-            int index = 1;
+            int index = 0;
             @Override
             public void onTick(long millisUntilFinished) {
 
@@ -109,7 +109,7 @@ public class DisplayCodeActivity extends AppCompatActivity {
                     Log.d("index value", String.valueOf(index));
                     index++;
                 } else {
-                    index = 1;
+                    index = 0;
                 }
             }
 
