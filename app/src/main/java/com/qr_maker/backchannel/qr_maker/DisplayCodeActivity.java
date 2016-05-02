@@ -49,8 +49,8 @@ public class DisplayCodeActivity extends AppCompatActivity {
 
     final int REQ_IMG_CAP = 1;
     private static int SIDE = 700;
-    private static int QRSIZE = 2000;
-    int TIME = 800;
+    private static int QRSIZE = 1500;
+    int TIME = 1000;
 
     CountDownTimer timer;
 
